@@ -20,7 +20,7 @@ public class DynamicDataSourceContextHolder {
          */
         @Override
         protected String initialValue() {
-            return "the-host";
+            return "master";
         }
     };
 

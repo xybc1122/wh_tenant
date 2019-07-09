@@ -58,13 +58,22 @@ public class WhWarehouseTenant extends ParentConfTable implements Serializable {
      */
     @NotBlank(message = "is null")
     private String tenant;
-
-
+    /**
+     * 租户有效时间
+     */
+    private Long effectiveTime;
     /**
      * 租户状态
      */
     private Integer tStatus;
 
+    public Long getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    public void setEffectiveTime(Long effectiveTime) {
+        this.effectiveTime = effectiveTime;
+    }
 
     public Integer gettStatus() {
         return tStatus;

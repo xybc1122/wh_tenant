@@ -1,13 +1,12 @@
-#Ö¸¶¨×¢²áÖĞĞÄµØÖ·
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://192.168.1.191:8660/eureka/
-#  instance:
-#    instance-id: ${spring.cloud.client.ip-address}:${server.port}
-#    prefer-ip-address: true
 server:
   port: 8888
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://192.168.1.231:8660/eureka/
+  instance:
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    prefer-ip-address: true
 spring:
   datasource:
     master:
@@ -17,12 +16,16 @@ spring:
       username: root
       password: root
     ################Redis
+  application:
+    name: tenant-service
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
   global-config:
     db-config:
-      logic-delete-value: 1 # Âß¼­ÒÑÉ¾³ıÖµ(Ä¬ÈÏÎª 1)
-      logic-not-delete-value: 0 # Âß¼­Î´É¾³ıÖµ(Ä¬ÈÏÎª 0)
+      logic-delete-value: 1 # é€»è¾‘å·²åˆ é™¤å€¼(é»˜è®¤ä¸º 1)
+      logic-not-delete-value: 0 # é€»è¾‘æœªåˆ é™¤å€¼(é»˜è®¤ä¸º 0)
+  #mapper-locations: classpath*:mapper/**/*.xml  #é…ç½®æ˜ å°„xmlåœ°å€
+
 

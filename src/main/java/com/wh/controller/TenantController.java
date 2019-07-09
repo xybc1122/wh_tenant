@@ -2,11 +2,10 @@ package com.wh.controller;
 
 import com.wh.base.JsonData;
 import com.wh.base.ResponseBase;
+import com.wh.dto.TenantStateDto;
 import com.wh.service.tenant.IWhWarehouseTenantService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @ClassName TenantController
@@ -17,14 +16,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/tenant")
 public class TenantController {
+
+
     @Autowired
     private IWhWarehouseTenantService tenantService;
 
-
+    /**
+     * 获得租户列表
+     *
+     * @return
+     */
     @GetMapping("/tenantList")
     public ResponseBase getTenantList() {
 
         return JsonData.setResultSuccess(tenantService.selTenantList());
+    }
+
+    /**
+     * 获得租户当前状态
+     *
+     * @param tenant
+     * @return
+     */
+    @GetMapping("/selTenantStatus")
+    public TenantStateDto getTenantStatus(@RequestParam("tenant") String tenant) {
+        return tenantService.selTenantStatus(tenant);
     }
 
 }
