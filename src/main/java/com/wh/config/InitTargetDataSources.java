@@ -5,6 +5,9 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.wh.dds.DynamicDataSource;
 import com.wh.entity.tenant.WhWarehouseTenant;
 import com.wh.service.tenant.IWhWarehouseTenantService;
+import com.wh.toos.Constants;
+import com.wh.toos.TenantConstants;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +37,7 @@ public class InitTargetDataSources implements CommandLineRunner {
     @Autowired
     private DynamicDataSource dynamicDataSource;
 
+
     private static InitTargetDataSources targetDataSources;
 
     //通过@PostConstruct实现初始化bean之前进行的操作
@@ -50,8 +56,12 @@ public class InitTargetDataSources implements CommandLineRunner {
      */
     @Override
     public void run(String... args) {
-        List<WhWarehouseTenant> tenantList = tenantService.selTenantList();
-        Map<Object, Object> dataSourceMap = tenantList.stream().collect(Collectors.toMap(
+        setTenantConfig(tenantService.selTenantList());
+    }
+
+
+    public void setTenantConfig(List<WhWarehouseTenant> tenantList) {
+        TenantConstants.dataSourceMap = tenantList.stream().collect(Collectors.toMap(
                 WhWarehouseTenant::getTenant, tenant -> {
                     DruidDataSource druidDataSource = new DruidDataSource();
                     druidDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -62,8 +72,9 @@ public class InitTargetDataSources implements CommandLineRunner {
                     return druidDataSource;
                 }
         ));
-        targetDataSources.dynamicDataSource.setDataSources(dataSourceMap);
+        targetDataSources.dynamicDataSource.setDataSources(TenantConstants.dataSourceMap);
         targetDataSources.dynamicDataSource.afterPropertiesSet();
+
     }
 
 }

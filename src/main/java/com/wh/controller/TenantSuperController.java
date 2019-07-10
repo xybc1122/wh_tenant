@@ -5,6 +5,7 @@ import com.wh.entity.role.WhUserRole;
 import com.wh.entity.tenant.WhTenantInfo;
 import com.wh.entity.tenant.WhWarehouseTenant;
 import com.wh.service.tenant.IWhWarehouseTenantService;
+import com.wh.toos.TenantConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -128,7 +129,6 @@ public class TenantSuperController {
     public ResponseBase insertTenantAndMen(@Valid @RequestBody WhUserRole whUserRole, BindingResult bindingResult) {
         return tenantService.saveTenantAndMenu(whUserRole, bindingResult);
     }
-
 
 
     /**

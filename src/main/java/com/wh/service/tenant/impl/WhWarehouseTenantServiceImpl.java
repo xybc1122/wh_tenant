@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wh.base.JsonData;
 import com.wh.base.ResponseBase;
+import com.wh.config.InitTargetDataSources;
 import com.wh.dds.DynamicDataSourceContextHolder;
 import com.wh.dto.TenantStateDto;
 import com.wh.entity.perms.WhUserPerms;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -59,6 +61,9 @@ public class WhWarehouseTenantServiceImpl extends ServiceImpl<WhWarehouseTenantM
 
     @Autowired
     private IWhUserRoleService roleService;
+
+    @Autowired
+    private InitTargetDataSources tDateSources;
 
     @Override
     public List<WhWarehouseTenant> selTenantList() {
@@ -114,7 +119,9 @@ public class WhWarehouseTenantServiceImpl extends ServiceImpl<WhWarehouseTenantM
         }
         //3 创建租户信息
         CheckUtils.saveResult(this.save(tenant));
-
+        List<WhWarehouseTenant> tList = new ArrayList<>();
+        tList.add(tenant);
+        tDateSources.setTenantConfig(tList);
         return JsonData.setResultSuccess("success");
     }
 

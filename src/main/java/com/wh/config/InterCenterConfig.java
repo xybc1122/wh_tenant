@@ -12,10 +12,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @Date 2019/7/2 14:25
  **/
 @Configuration
-public class CORSConfig implements WebMvcConfigurer {
+public class InterCenterConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new InterCenter()).addPathPatterns("/**");
+        registry.addInterceptor(new InterCenter()).addPathPatterns("/**").
+                excludePathPatterns("/api/v1/tenant/tenantList","/api/v1/tenant/selTenantStatus");
         WebMvcConfigurer.super.addInterceptors(registry);
     }
 

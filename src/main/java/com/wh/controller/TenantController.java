@@ -28,7 +28,6 @@ public class TenantController {
      */
     @GetMapping("/tenantList")
     public ResponseBase getTenantList() {
-
         return JsonData.setResultSuccess(tenantService.selTenantList());
     }
 
