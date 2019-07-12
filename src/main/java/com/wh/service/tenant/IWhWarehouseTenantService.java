@@ -30,16 +30,16 @@ public interface IWhWarehouseTenantService extends IService<WhWarehouseTenant> {
 
     TenantStateDto selTenantStatus(String tenant);
 
-    /**
-     * 超级管理员 查询租户的角色表
-     */
-    ResponseBase selTenantRole(Integer tId);
+//    /**
+//     * 超级管理员 查询租户的角色表
+//     */
+//    ResponseBase selTenantRole(Integer tId);
 
 
-    /**
-     * 超级管理员查询租户权限列表进行配置
-     */
-    ResponseBase selTenantPermission(Integer tId);
+//    /**
+//     * 超级管理员查询租户权限列表进行配置
+//     */
+//    ResponseBase selTenantPermission(Integer tId);
 
 
     /**

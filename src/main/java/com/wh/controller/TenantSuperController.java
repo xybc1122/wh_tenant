@@ -21,6 +21,8 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/super-tenant")
 public class TenantSuperController {
+
+
     @Autowired
     private IWhWarehouseTenantService tenantService;
 
@@ -93,13 +95,13 @@ public class TenantSuperController {
     }
 
 
-    /**
-     * 超级管理员查询租户表里的超级管理员 角色信息
-     */
-    @GetMapping("/selTenantRole")
-    public ResponseBase selTenantRole(@RequestParam("tid") Integer tid) {
-        return tenantService.selTenantRole(tid);
-    }
+//    /**
+//     * 超级管理员查询租户表里的超级管理员 角色信息
+//     */
+//    @GetMapping("/selTenantRole")
+//    public ResponseBase selTenantRole(@RequestParam("tid") Integer tid) {
+//        return tenantService.selTenantRole(tid);
+//    }
 
 
     /**
@@ -148,9 +150,9 @@ public class TenantSuperController {
      * @apiErrorExample {json} 失败返回样例子:
      * {"code":"-1","msg":"error","data":"{}"}
      */
-    @GetMapping("/selTenantPermission")
-    public ResponseBase tenantPermission(@RequestParam("tid") Integer tid) {
-        return tenantService.selTenantPermission(tid);
-    }
+//    @GetMapping("/selTenantPermission")
+//    public ResponseBase tenantPermission(@RequestParam("tid") Integer tid) {
+//        return tenantService.selTenantPermission(tid);
+//    }
 
 }
