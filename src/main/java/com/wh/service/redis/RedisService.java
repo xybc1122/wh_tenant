@@ -101,24 +101,24 @@ public class RedisService {
 //
 //
 
-    /**
-     * 写入缓存
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    public boolean setRt(final String key, Object value) {
-        boolean result = false;
-        try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value);
-            result = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
+//    /**
+//     * 写入缓存
+//     *
+//     * @param key
+//     * @param value
+//     * @return
+//     */
+//    public boolean setRt(final String key, Object value) {
+//        boolean result = false;
+//        try {
+//            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//            operations.set(key, value);
+//            result = true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return result;
+//    }
 //
 //    /**
 //     * 写入缓存设置时效时间
@@ -165,18 +165,18 @@ public class RedisService {
 //
 
 
-    /**
-     * 读取缓存
-     *
-     * @param key
-     * @return
-     */
-    public Object getRt(final String key) {
-        Object result = null;
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-        result = operations.get(key);
-        return result;
-    }
+//    /**
+//     * 读取缓存
+//     *
+//     * @param key
+//     * @return
+//     */
+//    public Object getRt(final String key) {
+//        Object result = null;
+//        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//        result = operations.get(key);
+//        return result;
+//    }
 //
 //    /**
 //     * 哈希 添加
@@ -209,8 +209,8 @@ public class RedisService {
      * @param k
      * @param v
      */
-    public void lPush(String k, Object v) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
+    public void lPush(String k, String v) {
+        ListOperations<String, String> list = stringRedisTemplate.opsForList();
         list.rightPush(k, v);
     }
 
@@ -222,8 +222,8 @@ public class RedisService {
      * @param l1
      * @return
      */
-    public List<Object> lRange(String k, long l, long l1) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
+    public List<String> lRange(String k, long l, long l1) {
+        ListOperations<String, String> list = stringRedisTemplate.opsForList();
         return list.range(k, l, l1);
     }
 
@@ -259,6 +259,17 @@ public class RedisService {
     public void zAdd(String key, Object value, double scoure) {
         ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
         zset.add(key, value, scoure);
+    }
+
+    /**
+     * 生成 keys
+     *
+     * @param tenant
+     * @return
+     */
+    public static String redisTenantKey(String tenant) {
+
+        return Constants.TENANT_KEY + ":" + tenant;
     }
 
     /**
@@ -489,12 +500,12 @@ public class RedisService {
                     return true;
                 }
             }
-            // 存放list类型
-            if (value instanceof List) {
-                List<Object> listValue = (List<Object>) value;
-                stringRedisTemplate.opsForList().leftPush(key, listValue.toString());
-                return true;
-            }
+//            // 存放list类型
+//            if (value instanceof List) {
+//                List<Object> listValue = (List<Object>) value;
+//                stringRedisTemplate.opsForList().leftPush(key, listValue.toString());
+//                return true;
+//            }
         } catch (Exception e) {
             throw new LsException("存入失败");
         }
@@ -552,17 +563,9 @@ public class RedisService {
      * @param key
      * @return
      */
-    public Set getKeys(String key) {
+    public Set<String> getKeys(String key) {
         if (key != null) {
             return stringRedisTemplate.keys(key + "*");
-        }
-        return null;
-    }
-
-    public String getListKey(String key) {
-        if (key != null) {
-            String leftPop = stringRedisTemplate.opsForList().leftPop(key);
-            return leftPop;
         }
         return null;
     }

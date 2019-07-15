@@ -1,6 +1,7 @@
 package com.wh.service.tenant.impl;
 
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wh.base.JsonData;
@@ -17,6 +18,7 @@ import com.wh.exception.LsException;
 import com.wh.mapper.tenant.WhWarehouseTenantMapper;
 import com.wh.service.menu.IWhUserMenuService;
 import com.wh.service.perms.IWhUserPermsService;
+import com.wh.service.redis.RedisService;
 import com.wh.service.rm.IWhUserRoleMenuService;
 import com.wh.service.role.IWhUserRoleService;
 import com.wh.service.tenant.IWhTenantInfoService;
@@ -24,6 +26,7 @@ import com.wh.service.tenant.IWhWarehouseTenantService;
 import com.wh.service.ur.IWhUserRoleUserService;
 import com.wh.service.user.IWhUserService;
 import com.wh.store.BindingResultStore;
+import com.wh.toos.Constants;
 import com.wh.utils.CheckUtils;
 import com.wh.utils.WrapperUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -65,10 +69,46 @@ public class WhWarehouseTenantServiceImpl extends ServiceImpl<WhWarehouseTenantM
     @Autowired
     private InitTargetDataSources tDateSources;
 
+    @Autowired
+    private IWhUserRoleMenuService roleMenuService;
+
+    @Autowired
+    private IWhUserPermsService permsService;
+
+    @Autowired
+    private RedisService redisService;
+
     @Override
-    public List<WhWarehouseTenant> selTenantList() {
-        return this.list();
+    public List<String> selTenantList() {
+        //看缓存有没有数据
+        Set<String> keys = redisService.getKeys(Constants.TENANT_KEY);
+        if (keys == null || keys.size() <= 0) {
+            //去数据库查询
+            List<WhWarehouseTenant> tenantList = tenantMapper.findTenantList();
+            if (tenantList != null && tenantList.size() > 0) {
+                List<String> strT = new ArrayList<>();
+                //存入redis
+                for (WhWarehouseTenant t : tenantList) {
+                    strT.add(JSON.toJSONString(t));
+                    redisService.setString(RedisService.redisTenantKey(t.getTenant()), JSON.toJSONString(t));
+                }
+                //返回数据
+                return strT;
+            }
+        }
+        //循环查询 key
+        return setTenants(keys);
     }
+
+    public List<String> setTenants(Set<String> keys) {
+        List<String> tenants = new ArrayList<>();
+        for (String str : keys) {
+            System.out.println(redisService.getStringKey(str));
+            tenants.add(redisService.getStringKey(str));
+        }
+        return tenants;
+    }
+
 
     @Override
     public TenantStateDto selTenantStatus(String tenant) {
@@ -76,27 +116,6 @@ public class WhWarehouseTenantServiceImpl extends ServiceImpl<WhWarehouseTenantM
         return tenantMapper.getTenantStatus(tenant);
     }
 
-
-    @Autowired
-    private IWhUserRoleMenuService roleMenuService;
-
-    @Autowired
-    private IWhUserPermsService permsService;
-
-    @Override
-    public ResponseBase selTenantRole(Integer tId) {
-        switchTenant(tId);
-        //3 查询角色信息返回
-        return JsonData.setResultSuccess(roleService.list());
-    }
-
-
-    @Override
-    public ResponseBase selTenantPermission(Integer tId) {
-        switchTenant(tId);
-        List<WhUserPerms> pList = permsService.lambdaQuery().select(WhUserPerms::getpId, WhUserPerms::getpName).list();
-        return JsonData.setResultSuccess(pList);
-    }
 
     @Override
     public ResponseBase selTenantMenu(Integer tId) {
@@ -119,9 +138,14 @@ public class WhWarehouseTenantServiceImpl extends ServiceImpl<WhWarehouseTenantM
         }
         //3 创建租户信息
         CheckUtils.saveResult(this.save(tenant));
-        List<WhWarehouseTenant> tList = new ArrayList<>();
-        tList.add(tenant);
+        List<String> tList = new ArrayList<>();
+        tList.add(JSON.toJSONString(tenant));
+        //放入全局 租户Map;
         tDateSources.setTenantConfig(tList);
+
+        //存入redis
+        redisService.setString(RedisService.redisTenantKey(tenant.getTenant()), JSON.toJSONString(tenant));
+
         return JsonData.setResultSuccess("success");
     }
 

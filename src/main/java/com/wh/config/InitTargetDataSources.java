@@ -2,6 +2,7 @@ package com.wh.config;
 
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSONObject;
 import com.wh.dds.DynamicDataSource;
 import com.wh.entity.tenant.WhWarehouseTenant;
 import com.wh.service.tenant.IWhWarehouseTenantService;
@@ -56,24 +57,26 @@ public class InitTargetDataSources implements CommandLineRunner {
      */
     @Override
     public void run(String... args) {
-        setTenantConfig(tenantService.selTenantList());
+        setTenantConfig(
+                tenantService.selTenantList());
     }
 
 
-    public void setTenantConfig(List<WhWarehouseTenant> tenantList) {
-        TenantConstants.dataSourceMap = tenantList.stream().collect(Collectors.toMap(
-                WhWarehouseTenant::getTenant, tenant -> {
-                    DruidDataSource druidDataSource = new DruidDataSource();
-                    druidDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-                    druidDataSource.setUrl(String.format(URL, tenant.getDbIp(), tenant.getDbDatabase()));
-                    druidDataSource.setUsername(tenant.getDbName());
-                    druidDataSource.setPassword(tenant.getDbPwd());
-                    druidDataSource.setDbType("com.alibaba.druid.pool.DruidDataSource");
-                    return druidDataSource;
-                }
-        ));
+    public void setTenantConfig(List<String> tenantList) {
+        for (String str : tenantList) {
+            JSONObject t = JSONObject.parseObject(str);
+            DruidDataSource druidDataSource = new DruidDataSource();
+            druidDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+            String URL = "jdbc:mysql://%s/%s?useUnicode=true&nullCatalogMeansCurrent=true&characterEncoding=utf-8&useSSL=false";
+            druidDataSource.setUrl(String.format(URL, t.get("dbIp"), t.get("dbDatabase")));
+            druidDataSource.setUsername(t.get("dbName").toString());
+            druidDataSource.setPassword(t.get("dbPwd").toString());
+            druidDataSource.setDbType("com.alibaba.druid.pool.DruidDataSource");
+            TenantConstants.dataSourceMap.put(t.get("tenant"), druidDataSource);
+        }
         targetDataSources.dynamicDataSource.setDataSources(TenantConstants.dataSourceMap);
         targetDataSources.dynamicDataSource.afterPropertiesSet();
+        System.out.println(TenantConstants.dataSourceMap);
 
     }
 

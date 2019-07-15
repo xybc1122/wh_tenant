@@ -1,7 +1,6 @@
 package com.wh.toos;
 
 
-
 public interface Constants {
 
     /**
@@ -16,5 +15,10 @@ public interface Constants {
      * 系统错误
      */
     Integer HTTP_RES_CODE = -1;
+
+    /**
+     * 租户key
+     */
+    String TENANT_KEY = "tenant_key";
 
 }

@@ -26,7 +26,7 @@ public interface IWhWarehouseTenantService extends IService<WhWarehouseTenant> {
      *
      * @return
      */
-    List<WhWarehouseTenant> selTenantList();
+    List<String> selTenantList();
 
     TenantStateDto selTenantStatus(String tenant);
 
